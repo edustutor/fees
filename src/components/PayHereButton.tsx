@@ -38,12 +38,14 @@ export function PayHereButton({ amount, customerDetails, onSuccess, onDismissed,
                 currency: currency
             });
 
+            const isSandbox = process.env.NEXT_PUBLIC_PAYHERE_MODE === 'sandbox';
+
             const payment = {
-                "sandbox": true, // TODO context based
+                "sandbox": isSandbox,
                 "merchant_id": merchantId,
                 "return_url": undefined,
                 "cancel_url": undefined,
-                "notify_url": process.env.NEXT_PUBLIC_PAYHERE_NOTIFY_URL, // ngrok url for local testing
+                "notify_url": process.env.NEXT_PUBLIC_PAYHERE_NOTIFY_URL,
                 "order_id": orderId,
                 "items": "Student Fees",
                 "amount": amount.toFixed(2),
