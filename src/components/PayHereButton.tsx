@@ -15,12 +15,13 @@ interface PayHereButtonProps {
         city: string;
         country: string;
     };
+    formData: any; // Pass the full form data to save the pending record
     onSuccess: (orderId: string) => void;
     onDismissed: () => void;
     onError: (error: string) => void;
 }
 
-export function PayHereButton({ amount, customerDetails, onSuccess, onDismissed, onError }: PayHereButtonProps) {
+export function PayHereButton({ amount, customerDetails, formData, onSuccess, onDismissed, onError }: PayHereButtonProps) {
     const [loading, setLoading] = useState(false);
 
     const handlePayment = async () => {
@@ -30,7 +31,15 @@ export function PayHereButton({ amount, customerDetails, onSuccess, onDismissed,
             const merchantId = process.env.NEXT_PUBLIC_MERCHANT_ID;
             const currency = 'LKR';
 
-            // Generate hash
+            // 1. Create Pending Record in Google Sheet (CRITICAL: Row must exist for Webhook to update it)
+            await axios.post('/api/submit-form', {
+                ...formData,
+                amount: amount,
+                payhereOrderId: orderId,
+                status: 'Pending'
+            });
+
+            // 2. Generate hash
             const { data: { hash } } = await axios.post('/api/payhere/hash', {
                 merchant_id: merchantId,
                 order_id: orderId,

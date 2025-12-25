@@ -310,6 +310,7 @@ export function FeeForm() {
                         <div className="mt-4">
                             <PayHereButton
                                 amount={parseFloat(formData.amount)}
+                                formData={formData}
                                 customerDetails={{
                                     firstName: formData.studentName.split(' ')[0] || 'Student',
                                     lastName: formData.studentName.split(' ').slice(1).join(' ') || '.',
