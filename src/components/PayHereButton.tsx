@@ -64,9 +64,40 @@ export function PayHereButton({ amount, customerDetails, onSuccess, onDismissed,
             // @ts-ignore
             if (typeof window.payhere !== 'undefined') {
                 // @ts-ignore
-                window.payhere.onCompleted = function onCompleted(orderId) {
-                    // console.log("Payment completed. OrderID:" + orderId);
-                    onSuccess(orderId);
+                window.payhere.onCompleted = async function onCompleted(orderId) {
+                    console.log("Payment completed. Verifying status...");
+                    setLoading(true);
+
+                    // Poll for verification
+                    let attempts = 0;
+                    const maxAttempts = 10; // 20 seconds approx
+
+                    const checkStatus = async () => {
+                        try {
+                            const res = await axios.post('/api/payhere/status', { order_id: orderId });
+                            const status = res.data.status;
+
+                            console.log(`Verification Attempts ${attempts}: ${status}`);
+
+                            if (status === 'Paid') {
+                                onSuccess(orderId);
+                            } else if (status === 'Failed' || status === 'Canceled') {
+                                onError(`Payment ${status}`);
+                            } else {
+                                if (attempts < maxAttempts) {
+                                    attempts++;
+                                    setTimeout(checkStatus, 2000);
+                                } else {
+                                    onError("Payment verification timed out. Please contact support.");
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Verification error", e);
+                            onError("Payment verification failed");
+                        }
+                    };
+
+                    checkStatus();
                 };
 
                 // @ts-ignore
@@ -89,8 +120,7 @@ export function PayHereButton({ amount, customerDetails, onSuccess, onDismissed,
         } catch (error) {
             console.error(error);
             onError("Failed to initiate payment");
-        } finally {
-            setLoading(false);
+            setLoading(false); // Enable button again if init failed
         }
     };
 

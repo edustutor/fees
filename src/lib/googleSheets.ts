@@ -92,3 +92,43 @@ export async function appendToSheet(data: Record<string, string | number>) {
         throw new Error('Failed to save to Google Sheet');
     }
 }
+
+export async function updatePaymentStatus(orderId: string, status: string) {
+    try {
+        await doc.loadInfo();
+        const sheet = doc.sheetsByTitle['FeesCollection'];
+        if (!sheet) return false;
+
+        const rows = await sheet.getRows();
+        const row = rows.find(r => r.get('PayHereOrderID') === orderId);
+
+        if (row) {
+            row.set('Status', status);
+            await row.save();
+            return true;
+        }
+        return false;
+    } catch (e) {
+        console.error('Error updating status:', e);
+        return false;
+    }
+}
+
+export async function getPaymentStatus(orderId: string) {
+    try {
+        await doc.loadInfo();
+        const sheet = doc.sheetsByTitle['FeesCollection'];
+        if (!sheet) return null;
+
+        const rows = await sheet.getRows();
+        const row = rows.find(r => r.get('PayHereOrderID') === orderId);
+
+        if (row) {
+            return row.get('Status');
+        }
+        return null;
+    } catch (e) {
+        console.error('Error fetching status:', e);
+        return null;
+    }
+}
