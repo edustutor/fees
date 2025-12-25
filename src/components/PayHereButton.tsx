@@ -80,20 +80,28 @@ export function PayHereButton({ amount, customerDetails, onSuccess, onDismissed,
                             console.log(`Verification Attempts ${attempts}: ${status}`);
 
                             if (status === 'Paid') {
+                                setLoading(false);
                                 onSuccess(orderId);
                             } else if (status === 'Failed' || status === 'Canceled') {
+                                setLoading(false);
                                 onError(`Payment ${status}`);
                             } else {
                                 if (attempts < maxAttempts) {
                                     attempts++;
-                                    setTimeout(checkStatus, 2000);
+                                    setTimeout(checkStatus, 3000); // Increased to 3s interval
                                 } else {
+                                    setLoading(false);
                                     onError("Payment verification timed out. Please contact support.");
                                 }
                             }
-                        } catch (e) {
+                        } catch (e: any) {
                             console.error("Verification error", e);
-                            onError("Payment verification failed");
+                            const msg = e.response?.data?.error || e.message || "Unknown error";
+                            console.log("Error details:", msg);
+                            // Don't fail immediately on network error, retry maybe? 
+                            // For now, fail to avoid infinite loops if server is down
+                            setLoading(false);
+                            onError("Payment verification failed: " + msg);
                         }
                     };
 

@@ -22,16 +22,21 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
         }
 
+        console.log(`[PayHere Notify] Received for Order: ${order_id}, Status: ${status_code}`);
+
         // 1. Verify Signature
-        // md5sig = strtoupper(md5(merchant_id + order_id + payhere_amount + payhere_currency + status_code + strtoupper(md5(merchant_secret))))
-        const secretHash = crypto.createHash('md5').update(merchant_secret.trim()).digest('hex').toUpperCase();
+        const secret = merchant_secret.trim();
+        const secretHash = crypto.createHash('md5').update(secret).digest('hex').toUpperCase();
         const sigString = `${merchant_id}${order_id}${payhere_amount}${payhere_currency}${status_code}${secretHash}`;
         const localSig = crypto.createHash('md5').update(sigString).digest('hex').toUpperCase();
 
         if (localSig !== md5sig) {
-            console.error('PayHere Signature Mismatch');
+            console.error(`[PayHere Notify] Signature Mismatch! Local: ${localSig} vs Received: ${md5sig}`);
+            console.log(`[PayHere Notify] Sig String used: ${sigString}`);
             return NextResponse.json({ error: 'Signature mismatch' }, { status: 400 });
         }
+
+        console.log(`[PayHere Notify] Signature Verified. Updating Status...`);
 
         // 2. Update Status
         // Status Codes: 2 = Success, 0 = Pending, -1 = Canceled, -2 = Failed, -3 = Chargedback
