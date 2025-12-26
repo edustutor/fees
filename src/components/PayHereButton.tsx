@@ -119,12 +119,14 @@ export function PayHereButton({ amount, customerDetails, formData, onSuccess, on
 
                 // @ts-ignore
                 window.payhere.onDismissed = function onDismissed() {
+                    setLoading(false);
                     onDismissed();
                 };
 
                 // @ts-ignore
                 window.payhere.onError = function onError(error) {
                     onError(error);
+                    setLoading(false);
                 };
 
                 // @ts-ignore
