@@ -10,6 +10,7 @@ import Image from 'next/image';
 // import { useForm } from 'react-hook-form'; 
 
 const GRADES = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'A/L'];
+const FEES_TYPES = ['Monthly Fee', 'Exam Fee', 'Monthly + Exam Fee'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 // Helper component for consistent layout
@@ -45,10 +46,12 @@ const CardLayout = ({ children }: { children: React.ReactNode }) => (
 export function FeeForm() {
     const [formData, setFormData] = useState({
         studentName: '',
+        admissionNo: '',
         parentName: '',
         grade: '',
         medium: '', // New field
         phone: '',
+        feesType: '',
         month: '',
         amount: '',
         paymentMethod: ''
@@ -63,7 +66,7 @@ export function FeeForm() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const isFormValid = formData.studentName && formData.parentName && formData.grade && formData.medium && formData.phone.length === 10 && formData.month && formData.amount && formData.paymentMethod;
+    const isFormValid = formData.studentName && formData.admissionNo && formData.parentName && formData.grade && formData.medium && formData.phone.length === 10 && formData.feesType && formData.month && formData.amount && formData.paymentMethod;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -162,6 +165,18 @@ export function FeeForm() {
                 {/* Student Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Admission No.</label>
+                        <input
+                            type="text"
+                            name="admissionNo"
+                            value={formData.admissionNo}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
+                            placeholder="ED1001"
+                        />
+                    </div>
+                    <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Student Name</label>
                         <input
                             type="text"
@@ -173,6 +188,9 @@ export function FeeForm() {
                             placeholder="Destiny Meadows"
                         />
                     </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Parent Name</label>
                         <input
@@ -183,6 +201,27 @@ export function FeeForm() {
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
                             placeholder="Finn Conway"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Phone Number (10 digits)</label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            value={formData.phone}
+                            onChange={(e) => {
+                                const re = /^[0-9\b]+$/;
+                                if (e.target.value === '' || re.test(e.target.value)) {
+                                    if (e.target.value.length <= 10) {
+                                        handleChange(e);
+                                    }
+                                }
+                            }}
+                            pattern="[0-9]{10}"
+                            title="Phone number must be exactly 10 digits"
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
+                            placeholder="0771234567"
                         />
                     </div>
                 </div>
@@ -219,30 +258,23 @@ export function FeeForm() {
                     </div>
                 </div>
 
-                <div className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-700">Phone Number (10 digits)</label>
-                    <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={(e) => {
-                            const re = /^[0-9\b]+$/;
-                            if (e.target.value === '' || re.test(e.target.value)) {
-                                if (e.target.value.length <= 10) {
-                                    handleChange(e);
-                                }
-                            }
-                        }}
-                        pattern="[0-9]{10}"
-                        title="Phone number must be exactly 10 digits"
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
-                        placeholder="0771234567"
-                    />
-                </div>
+
 
                 {/* Payment Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <label className="text-sm font-semibold text-gray-700">Fees Type</label>
+                        <select
+                            name="feesType"
+                            value={formData.feesType}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-gray-50 text-gray-900 font-medium"
+                        >
+                            <option value="">Select Fee Type</option>
+                            {FEES_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                    </div>
                     <div className="space-y-1">
                         <label className="text-sm font-semibold text-gray-700">Month</label>
                         <select
@@ -256,19 +288,20 @@ export function FeeForm() {
                             {MONTHS.map(m => <option key={m} value={m}>{m}</option>)}
                         </select>
                     </div>
-                    <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Amount (LKR)</label>
-                        <input
-                            type="number"
-                            name="amount"
-                            value={formData.amount}
-                            onChange={handleChange}
-                            required
-                            min="1"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
-                            placeholder="2500.00"
-                        />
-                    </div>
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-semibold text-gray-700">Amount (LKR)</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        required
+                        min="1"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
+                        placeholder="2500.00"
+                    />
                 </div>
 
                 {/* Payment Method */}

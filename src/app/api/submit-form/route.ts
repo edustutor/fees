@@ -6,10 +6,12 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const {
             studentName,
+            admissionNo,
             parentName,
             phone,
             grade,
             medium,
+            feesType,
             month,
             paymentMethod,
             amount,
@@ -25,11 +27,13 @@ export async function POST(req: NextRequest) {
 
         await appendToSheet({
             Timestamp: timestamp,
+            AdmissionNo: admissionNo || '',
             StudentName: studentName,
             ParentName: parentName,
             Grade: grade,
             Medium: medium || '',
             Phone: phone,
+            FeesType: feesType || '',
             Month: month,
             PaymentMethod: paymentMethod,
             Amount: amount,

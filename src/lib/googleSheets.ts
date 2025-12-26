@@ -38,11 +38,13 @@ export async function appendToSheet(data: Record<string, string | number>) {
                 title: 'FeesCollection',
                 headerValues: [
                     'Timestamp',
+                    'AdmissionNo', // New
                     'StudentName',
                     'ParentName',
                     'Grade',
-                    'Medium', // New Column match user order
+                    'Medium',
                     'Phone',
+                    'FeesType', // New
                     'Month',
                     'PaymentMethod',
                     'Amount',
@@ -59,7 +61,8 @@ export async function appendToSheet(data: Record<string, string | number>) {
             let shouldSetHeaders = false;
             try {
                 await sheet.loadHeaderRow();
-                if (sheet.headerValues.length === 0 || !sheet.headerValues.includes('Medium')) {
+                // Check if new columns exist
+                if (sheet.headerValues.length === 0 || !sheet.headerValues.includes('AdmissionNo') || !sheet.headerValues.includes('FeesType')) {
                     shouldSetHeaders = true;
                 }
             } catch (e) {
@@ -71,11 +74,13 @@ export async function appendToSheet(data: Record<string, string | number>) {
                 // Force update headers to include Medium
                 await sheet.setHeaderRow([
                     'Timestamp',
+                    'AdmissionNo',
                     'StudentName',
                     'ParentName',
                     'Grade',
                     'Medium',
                     'Phone',
+                    'FeesType',
                     'Month',
                     'PaymentMethod',
                     'Amount',
