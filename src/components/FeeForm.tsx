@@ -60,13 +60,40 @@ export function FeeForm() {
     const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
     const [bankFile, setBankFile] = useState<File | null>(null);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+
+        // Real-time validation
+        if (name === 'phone') {
+            if (!/^\d*$/.test(value)) {
+                return; // Only allow numbers
+            }
+            if (value.length > 10) return; // Prevent more than 10 digits
+
+            if (value.length !== 10) {
+                setErrors(prev => ({ ...prev, phone: 'Phone number must be exactly 10 digits' }));
+            } else {
+                setErrors(prev => {
+                    const newErrors = { ...prev };
+                    delete newErrors.phone;
+                    return newErrors;
+                });
+            }
+        }
+        // Generalized clean up for other required fields
+        else if (value.trim() !== '') {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[name];
+                return newErrors;
+            });
+        }
     };
 
-    const isFormValid = formData.studentName && formData.admissionNo && formData.parentName && formData.grade && formData.medium && formData.phone.length === 10 && formData.feesType && formData.month && formData.amount && formData.paymentMethod;
+    const isFormValid = formData.studentName && formData.admissionNo && formData.parentName && formData.grade && formData.medium && formData.phone.length === 10 && !errors.phone && formData.feesType && formData.month && formData.amount && formData.paymentMethod;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -159,13 +186,13 @@ export function FeeForm() {
     return (
         <CardLayout>
             <h2 className="text-3xl font-extrabold text-blue-900 mb-2 text-center uppercase">FAST & EASY PAYMENTS!</h2>
-            <p className="text-center text-gray-500 mb-8 font-medium text-balance">Easily transfer Online or deposit via CDM or Slip - quick and hassle -&nbsp;free!</p>
+            <p className="text-center text-gray-500 mb-8 font-medium text-balance">Easily transfer online or deposit via CDM or slip — quick &nbsp;hassle-free!</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Student Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Admission No.</label>
+                        <label className="text-sm font-semibold text-gray-700">Admission No. <span className="text-red-500">*</span></label>
                         <input
                             type="text"
                             name="admissionNo"
@@ -177,7 +204,7 @@ export function FeeForm() {
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Student Name</label>
+                        <label className="text-sm font-semibold text-gray-700">Student Name <span className="text-red-500">*</span></label>
                         <input
                             type="text"
                             name="studentName"
@@ -192,7 +219,7 @@ export function FeeForm() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Parent Name</label>
+                        <label className="text-sm font-semibold text-gray-700">Parent Name <span className="text-red-500">*</span></label>
                         <input
                             type="text"
                             name="parentName"
@@ -204,32 +231,29 @@ export function FeeForm() {
                         />
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Phone Number (10 digits)</label>
+                        <label className="text-sm font-semibold text-gray-700">Phone Number <span className="text-red-500">*</span></label>
                         <input
                             type="tel"
                             name="phone"
                             value={formData.phone}
-                            onChange={(e) => {
-                                const re = /^[0-9\b]+$/;
-                                if (e.target.value === '' || re.test(e.target.value)) {
-                                    if (e.target.value.length <= 10) {
-                                        handleChange(e);
-                                    }
-                                }
-                            }}
+                            onChange={handleChange}
                             pattern="[0-9]{10}"
                             title="Phone number must be exactly 10 digits"
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
+                            className={cn(
+                                "w-full px-4 py-2 border rounded-lg focus:ring-2 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium",
+                                errors.phone ? "border-red-500 focus:ring-red-200" : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                            )}
                             placeholder="0771234567"
                         />
+                        {errors.phone && <p className="text-xs text-red-500 font-medium">{errors.phone}</p>}
                     </div>
                 </div>
 
                 {/* Grade and Medium */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Grade</label>
+                        <label className="text-sm font-semibold text-gray-700">Grade <span className="text-red-500">*</span></label>
                         <select
                             name="grade"
                             value={formData.grade}
@@ -242,7 +266,7 @@ export function FeeForm() {
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Medium</label>
+                        <label className="text-sm font-semibold text-gray-700">Medium <span className="text-red-500">*</span></label>
                         <select
                             name="medium"
                             value={formData.medium}
@@ -263,7 +287,7 @@ export function FeeForm() {
                 {/* Payment Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Fees Type</label>
+                        <label className="text-sm font-semibold text-gray-700">Fees Type <span className="text-red-500">*</span></label>
                         <select
                             name="feesType"
                             value={formData.feesType}
@@ -276,7 +300,7 @@ export function FeeForm() {
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Month</label>
+                        <label className="text-sm font-semibold text-gray-700">Month <span className="text-red-500">*</span></label>
                         <select
                             name="month"
                             value={formData.month}
@@ -291,7 +315,7 @@ export function FeeForm() {
                 </div>
 
                 <div className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-700">Amount (LKR)</label>
+                    <label className="text-sm font-semibold text-gray-700">Amount (LKR) <span className="text-red-500">*</span></label>
                     <input
                         type="number"
                         name="amount"
@@ -306,7 +330,7 @@ export function FeeForm() {
 
                 {/* Payment Method */}
                 <div className="space-y-1">
-                    <label className="text-sm font-semibold text-gray-700">Payment Method</label>
+                    <label className="text-sm font-semibold text-gray-700">Payment Method <span className="text-red-500">*</span></label>
                     <select
                         name="paymentMethod"
                         value={formData.paymentMethod}
