@@ -159,7 +159,7 @@ export function FeeForm() {
     return (
         <CardLayout>
             <h2 className="text-3xl font-extrabold text-blue-900 mb-2 text-center uppercase">FAST & EASY PAYMENTS!</h2>
-            <p className="text-center text-gray-500 mb-8 font-medium">Easily transfer Online or deposit via CDM or Slip - quick and hassle - free!</p>
+            <p className="text-center text-gray-500 mb-8 font-medium text-balance">Easily transfer Online or deposit via CDM or Slip - quick and hassle -&nbsp;free!</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Student Details */}
@@ -185,7 +185,7 @@ export function FeeForm() {
                             onChange={handleChange}
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
-                            placeholder="Destiny Meadows"
+                            placeholder="Anushalini"
                         />
                     </div>
                 </div>
@@ -200,7 +200,7 @@ export function FeeForm() {
                             onChange={handleChange}
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
-                            placeholder="Finn Conway"
+                            placeholder="Sivakumar"
                         />
                     </div>
                     <div className="space-y-1">
