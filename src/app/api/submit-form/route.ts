@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { appendToSheet } from '@/lib/googleSheets';
+import { sendBankPaymentSMS } from '@/lib/sms';
 
 export async function POST(req: NextRequest) {
     try {
@@ -41,6 +42,15 @@ export async function POST(req: NextRequest) {
             PayHereOrderID: payhereOrderId || '',
             Status: status || 'Pending', // 'Pending' for bank transfers usually, 'Paid' for PayHere success
         });
+
+        if (paymentMethod === 'bank') {
+            try {
+                // Send specific SMS for bank transfer
+                await sendBankPaymentSMS(phone, studentName);
+            } catch (smsError) {
+                console.error("Error sending bank SMS:", smsError);
+            }
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {
