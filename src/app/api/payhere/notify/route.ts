@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
-import { updatePaymentStatus } from '@/lib/googleSheets';
+import { updatePaymentStatus, getOrderDetails } from '@/lib/googleSheets';
+import { sendPaymentSuccessSMS } from '@/lib/sms';
 
 export async function POST(req: NextRequest) {
     try {
@@ -53,6 +54,20 @@ export async function POST(req: NextRequest) {
 
         console.log(`Updating order ${order_id} to status: ${status}`);
         await updatePaymentStatus(order_id!, status);
+
+        // 3. Send SMS if Paid
+        if (status === 'Paid') {
+            try {
+                const orderDetails = await getOrderDetails(order_id!);
+                if (orderDetails && orderDetails.phone) {
+                    await sendPaymentSuccessSMS(orderDetails.phone, orderDetails.studentName, orderDetails.amount);
+                } else {
+                    console.warn(`[SMS] Could not fetch details for Order ${order_id}`);
+                }
+            } catch (smsError) {
+                console.error('[SMS] Error sending SMS:', smsError);
+            }
+        }
 
         return NextResponse.json({ success: true });
 

@@ -132,8 +132,32 @@ export async function getPaymentStatus(orderId: string) {
             return row.get('Status');
         }
         return null;
+        return null;
     } catch (e) {
         console.error('Error fetching status:', e);
+        return null;
+    }
+}
+
+export async function getOrderDetails(orderId: string) {
+    try {
+        await doc.loadInfo();
+        const sheet = doc.sheetsByTitle['FeesCollection'];
+        if (!sheet) return null;
+
+        const rows = await sheet.getRows();
+        const row = rows.find(r => r.get('PayHereOrderID') === orderId);
+
+        if (row) {
+            return {
+                studentName: row.get('StudentName'),
+                phone: row.get('Phone'),
+                amount: row.get('Amount')
+            };
+        }
+        return null;
+    } catch (e) {
+        console.error('Error fetching details:', e);
         return null;
     }
 }
