@@ -63,25 +63,35 @@ export function FeeForm() {
     const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
+        let { name, value } = e.target;
+
+        // Special handling for Phone Number
+        if (name === 'phone') {
+            // 1. Auto Trim spaces immediately
+            value = value.replace(/\s/g, '');
+
+            // 2. Block non-digits entirely
+            if (!/^\d*$/.test(value)) return;
+
+            // 3. Block input if > 10 digits
+            if (value.length > 10) return;
+        }
+
         setFormData(prev => ({ ...prev, [name]: value }));
 
-        // Real-time validation
+        // Real-time Validation Errors
         if (name === 'phone') {
-            if (!/^\d*$/.test(value)) {
-                return; // Only allow numbers
-            }
-            if (value.length > 10) return; // Prevent more than 10 digits
+            const newErrors = { ...errors };
 
-            if (value.length !== 10) {
-                setErrors(prev => ({ ...prev, phone: 'Phone number must be exactly 10 digits' }));
+            if (value.length > 0 && value[0] !== '0') {
+                newErrors.phone = "Phone number must start with '0'";
+            } else if (value.length > 0 && value.length !== 10) {
+                // Note: We show error if not 10, but only if they've started typing
+                newErrors.phone = 'Phone number must be exactly 10 digits';
             } else {
-                setErrors(prev => {
-                    const newErrors = { ...prev };
-                    delete newErrors.phone;
-                    return newErrors;
-                });
+                delete newErrors.phone;
             }
+            setErrors(newErrors);
         }
         // Generalized clean up for other required fields
         else if (value.trim() !== '') {
@@ -186,7 +196,7 @@ export function FeeForm() {
     return (
         <CardLayout>
             <h2 className="text-3xl font-extrabold text-blue-900 mb-2 text-center uppercase">FAST & EASY PAYMENTS!</h2>
-            <p className="text-center text-gray-500 mb-8 font-medium text-balance">Easily transfer online or deposit via CDM or slip — quick &nbsp;hassle-free!</p>
+            <p className="text-center text-gray-500 mb-8 font-medium text-balance">Easily transfer online or deposit via CDM or slip - quick & hassle - free. </p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Student Details */}

@@ -108,6 +108,23 @@ export function BankTransfer({ amount, onFileSelect }: BankTransferProps) {
                             {fileName ? <span className="font-semibold truncate max-w-[200px]">{fileName}</span> : "Click to select receipt"}
                         </label>
                     </div>
+                    {fileName && (
+                        <button
+                            onClick={() => {
+                                setFileName(null);
+                                onFileSelect(null);
+                                setError(null);
+                                // Reset the file input value to allow re-selecting same file
+                                const input = document.getElementById('file-upload') as HTMLInputElement;
+                                if (input) input.value = '';
+                            }}
+                            className="p-3 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition"
+                            title="Remove file"
+                            type="button"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    )}
                 </div>
 
                 {error && <p className="text-red-500 text-sm font-medium">{error}</p>}
