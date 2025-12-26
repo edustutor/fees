@@ -15,10 +15,10 @@ export async function POST(req: NextRequest) {
         const status_code = params.get('status_code');
         const md5sig = params.get('md5sig');
 
-        const merchant_secret = process.env.MERCHANT_SECRET;
+        const merchant_secret = process.env.NEXT_PUBLIC_MERCHANT_SECRET;
 
         if (!merchant_secret) {
-            console.error('MERCHANT_SECRET is not set');
+            console.error('NEXT_PUBLIC_MERCHANT_SECRET is not set');
             return NextResponse.json({ error: 'Configuration error' }, { status: 500 });
         }
 

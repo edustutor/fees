@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { merchant_id, order_id, amount, currency } = body;
-        const merchant_secret = process.env.MERCHANT_SECRET;
+        const merchant_secret = process.env.NEXT_PUBLIC_MERCHANT_SECRET;
 
         if (!merchant_id || !order_id || !amount || !currency || !merchant_secret) {
             return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
