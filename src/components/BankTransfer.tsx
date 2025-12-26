@@ -36,7 +36,7 @@ const BANK_ACCOUNTS = [
         name: "Cargills Bank",
         display: "CargillsBank",
         accountHolder: "EDUS Lanka (PVT) LTD",
-        accountNumber: "001003000356",
+        accountNumber: "00110300356",
         branch: "001 - Corporate Branch"
     }
 ];
