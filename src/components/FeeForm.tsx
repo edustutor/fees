@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { BankTransfer } from './BankTransfer';
 import { PayHereButton } from './PayHereButton';
 import axios from 'axios';
-import { Loader2, CheckCircle, Phone } from 'lucide-react';
+import { Loader2, CheckCircle, Phone, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 // import { useForm } from 'react-hook-form'; 
 
 const GRADES = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'A/L', 'Other'];
-const FEES_TYPES = ['Monthly Fee', 'Exam Fee', 'Monthly + Exam Fee', 'Course Fees'];
+const FEES_TYPES = ['Monthly Fee', 'Exam Fee', 'Monthly + Exam Fee', 'Course Fees', 'New Admission'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 // Helper component for consistent layout
@@ -61,6 +61,7 @@ export function FeeForm() {
     const [errorMessage, setErrorMessage] = useState('');
     const [bankFile, setBankFile] = useState<File | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [showInfo, setShowInfo] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         let { name, value } = e.target;
@@ -148,20 +149,10 @@ export function FeeForm() {
     };
 
     const handlePayHereSuccess = async (orderId: string) => {
-        setStatus('submitting');
-        try {
-            await axios.post('/api/submit-form', {
-                ...formData,
-                amount: parseFloat(formData.amount),
-                payhereOrderId: orderId,
-                status: 'Paid'
-            });
-            setStatus('success');
-        } catch (error) {
-            console.error(error);
-            setErrorMessage("Payment successful but failed to save record. Please contact support.");
-            setStatus('error');
-        }
+        // The webhook has already updated the Google Sheet row to 'Paid'
+        // And the PayHereButton polling has verified it.
+        // We just need to show the success message.
+        setStatus('success');
     }
 
 
@@ -201,8 +192,23 @@ export function FeeForm() {
             <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Student Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                        <label className="text-sm font-semibold text-gray-700">Admission No. <span className="text-red-500">*</span></label>
+                    <div className="space-y-1 relative">
+                        <div className="flex items-center gap-1">
+                            <label className="text-sm font-semibold text-gray-700">Reference Number <span className="text-red-500">*</span></label>
+                            <button
+                                type="button"
+                                onClick={() => setShowInfo(!showInfo)}
+                                className="text-blue-500 hover:text-blue-700 focus:outline-none"
+                            >
+                                <Info className="w-4 h-4" />
+                            </button>
+                        </div>
+                        {showInfo && (
+                            <div className="absolute z-10 top-8 left-0 w-64 p-3 bg-white border border-blue-200 rounded-lg shadow-lg text-xs text-gray-600">
+                                To make the payment you can add your Admission number or invoice number or proposal number.
+                                <div className="mt-1 font-mono text-blue-600">Example: ED1001 / INV-1212 / PRO-1001</div>
+                            </div>
+                        )}
                         <input
                             type="text"
                             name="admissionNo"
@@ -210,7 +216,7 @@ export function FeeForm() {
                             onChange={handleChange}
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition text-gray-900 placeholder-gray-400 bg-gray-50 font-medium"
-                            placeholder="ED1001"
+                            placeholder="ED1001 / INV-1212 / PRO-1001"
                         />
                     </div>
                     <div className="space-y-1">
