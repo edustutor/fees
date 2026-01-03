@@ -387,7 +387,7 @@ export function FeeForm() {
                                 customerDetails={{
                                     firstName: formData.studentName.split(' ')[0] || 'Student',
                                     lastName: formData.studentName.split(' ').slice(1).join(' ') || '.',
-                                    email: 'sugeevan@edus.lk',
+                                    email: 'newadmissions@edustutor.com',
                                     phone: formData.phone,
                                     address: 'N/A',
                                     city: 'N/A',
