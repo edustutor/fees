@@ -16,7 +16,7 @@ export async function sendPaymentSuccessSMS(phone: string, studentName: string, 
     // The prompt example shows "to=0701234567" so we keep it as is, or ensure it matches the provider requirement.
     // Let's rely on the input for now, assuming it's a valid local number.
 
-    const message = `Dear ${studentName}, we have received your payment of Rs. ${amount}. For urgent queries, call 011 447 7488. Thank you! edus.lk`;
+    const message = `Dear ${studentName}, we have received your payment of Rs. ${amount}. For urgent queries, call 070 707 2072. Thank you! edus.lk`;
 
     try {
         const url = `https://quicksend.lk/Client/api.php?FUN=SEND_SINGLE&with_get=true&un=${SMS_USER_EMAIL}&up=${SMS_API_KEY}&senderID=${SMS_SENDER_ID}&msg=${encodeURIComponent(message)}&to=${phone}`;
@@ -37,7 +37,7 @@ export async function sendBankPaymentSMS(phone: string, studentName: string) {
         return false;
     }
 
-    const message = `Dear ${studentName}, we have received your payment update. Please allow us some time to verify and once approved, our Student Admin will call you and add you to the class with full details. For urgent queries, call 011 447 7488. – EDUS Online Institute.`;
+    const message = `Dear ${studentName}, we have received your payment update. Please allow us some time to verify and once approved, our Student Admin will call you and add you to the class with full details. For urgent queries, call 070 707 2072. – EDUS Online Institute.`;
 
     try {
         const url = `https://quicksend.lk/Client/api.php?FUN=SEND_SINGLE&with_get=true&un=${SMS_USER_EMAIL}&up=${SMS_API_KEY}&senderID=${SMS_SENDER_ID}&msg=${encodeURIComponent(message)}&to=${phone}`;
